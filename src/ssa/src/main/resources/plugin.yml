@@ -1,0 +1,4 @@
+name: Ssa
+version: ${project.version}
+main: ssa.ssa.Ssa
+api-version: 1.14

@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  minecraft:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+    container_name: minecraft
+    stdin_open: true
+    tty: true
+    restart: always
+    networks:
+      - minecraft
+    ports:
+      - 25565:25565
+    volumes:
+      - ./config:/opt/minecraft/config
+      - ./worlds:/opt/minecraft/worlds
+      - ./plugins:/opt/minecraft/plugins
+      - ./data:/opt/minecraft/data
+      - ./logs:/opt/minecraft/logs
+    links:
+      - minecraft-db
+  minecraft-db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    networks:
+      - minecraft
+    volumes:
+      - ./.docker/mysql:/var/lib/mysql
+
+
+networks:
+  minecraft: {}

@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  minecraft:
+    image: 003577947065.dkr.ecr.us-east-1.amazonaws.com/minecraft-server
+    container_name: minecraft-server-live
+    stdin_open: true
+    tty: true
+    restart: always
+    networks:
+      - minecraft
+    ports:
+      - 25565:25565
+    volumes:
+      - ./worlds:/opt/minecraft/worlds
+      - ./data:/opt/minecraft/data
+      - ./logs:/opt/minecraft/logs
+
+networks:
+  minecraft: {}

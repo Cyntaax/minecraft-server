@@ -1,0 +1,59 @@
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+      - name: Refresh Terraform State
+        run: |
+          cd infrastructure
+          terraform init
+          terraform refresh
+          echo "ECR_REPO=$(terraform output --raw ecr_repo)" >> $GITHUB_ENV
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPO }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker-compose -f docker-compose.build.yml build
+          docker-compose -f docker-compose.build.yml push
+      - name: Get SSH key - Copy files - Start container
+        run: |
+          cd infrastructure && terraform output --raw private_key > ~/key.pem
+          chmod 600 ~/key.pem
+          eval "$(ssh-agent -s)"
+          ssh-add ~/key.pem
+          export SERVER_IP=$(terraform output --raw server_ip)
+          mkdir -p ~/.ssh
+          touch ~/.ssh/config
+          chmod 600 ~/.ssh/config
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+          ssh ubuntu@$SERVER_IP docker run amazon/aws-cli ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+          cd ${{ github.workspace }}
+          scp ./docker-compose.production.yml ubuntu@$SERVER_IP:~/bot/docker-compose.yml
+          ssh ubuntu@$SERVER_IP "cd ./bot && docker-compose pull && docker-compose up -d"

@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  minecraft:
+    image: 003577947065.dkr.ecr.us-east-1.amazonaws.com/minecraft-server
+    build:
+      context: .
+      dockerfile: prod.Dockerfile
+      args:
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+
+networks:
+  minecraft: {}

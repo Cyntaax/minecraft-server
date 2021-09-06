@@ -1,0 +1,15 @@
+worlds/**
+!worlds/.gitkeep
+logs/**
+!logs/.gitkeep
+data/**
+!data/.gitkeep
+.DS_Store
+.idea
+src/**/target
+.docker
+cache/**
+!cache/.gitkeep
+.terraform
+*.lock.hcl
+*.backup
