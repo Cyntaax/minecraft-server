@@ -10,3 +10,7 @@ output "private_key" {
 output "server_ip" {
   value = aws_instance.server.public_ip
 }
+
+output "ecr_repo" {
+  value = aws_ecr_repository.minecraft-server.name
+}
