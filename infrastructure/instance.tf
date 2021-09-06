@@ -1,6 +1,6 @@
 resource "aws_instance" "server" {
   ami = "ami-042e8287309f5df03"
-  instance_type = "t3.micro"
+  instance_type = "t3a.medium"
   key_name      = aws_key_pair.server-kp.key_name
   availability_zone = "us-east-1a"
   tags = {
@@ -9,6 +9,9 @@ resource "aws_instance" "server" {
 
   security_groups = [aws_security_group.allow_all.name]
   iam_instance_profile = aws_iam_instance_profile.server-profile.id
+  root_block_device {
+    volume_size = 60
+  }
 }
 
 resource "null_resource" "server-init" {
