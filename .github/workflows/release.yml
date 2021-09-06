@@ -53,7 +53,7 @@ jobs:
           touch ~/.ssh/config
           chmod 600 ~/.ssh/config
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-          ssh ubuntu@$SERVER_IP docker run amazon/aws-cli ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+          ssh ubuntu@$SERVER_IP "docker run amazon/aws-cli ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}"
           cd ${{ github.workspace }}
           scp ./docker-compose.production.yml ubuntu@$SERVER_IP:~/bot/docker-compose.yml
           ssh ubuntu@$SERVER_IP "cd ./bot && docker-compose pull && docker-compose up -d"
