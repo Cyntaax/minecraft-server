@@ -51,7 +51,7 @@ WORKDIR ${SERVER_PATH}
 ###########################################
 ### Obtain runable jar from build stage ###
 ###########################################
-COPY cache/paper.jar ${SERVER_PATH}/
+COPY paper/paper.jar ${SERVER_PATH}/
 
 ######################
 ### Obtain scripts ###
