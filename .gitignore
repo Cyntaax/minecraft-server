@@ -13,3 +13,4 @@ cache/**
 .terraform
 *.lock.hcl
 *.backup
+*.pem
