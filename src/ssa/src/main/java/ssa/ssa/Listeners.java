@@ -38,15 +38,7 @@ public class Listeners implements Listener {
     public void onMove(PlayerMoveEvent moveEvent) {
         Location loc = moveEvent.getPlayer().getLocation().clone().subtract(0,1,0);
     }
-
-    @EventHandler
-    public void onDamage(EntityDamageEvent entityDamageEvent) {
-        if(entityDamageEvent.getEntity() instanceof Player) {
-            Player p = (Player) entityDamageEvent.getEntity();
-            entityDamageEvent.setCancelled(true);
-        }
-
-    }
+    
 
     @EventHandler
     public void onStart(PluginEnableEvent enableEvent) {
