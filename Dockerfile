@@ -1,10 +1,10 @@
 # Java Version
-ARG JAVA_VERSION=16
+ARG JAVA_VERSION=19-jdk
 
 ###########################
 ### Running environment ###
 ###########################
-FROM openjdk:${JAVA_VERSION}-alpine AS runtime
+FROM openjdk:${JAVA_VERSION}-alpine3.16 AS runtime
 
 ##########################
 ### Environment & ARGS ###
@@ -27,7 +27,7 @@ ENV PAPER_ARGS=""
 #################
 ADD https://bootstrap.pypa.io/get-pip.py .
 RUN apk update
-RUN apk add python3 gettext
+RUN apk add python3 gettext curl bash
 RUN python3 get-pip.py
 
 RUN pip install mcstatus
@@ -51,7 +51,9 @@ WORKDIR ${SERVER_PATH}
 ###########################################
 ### Obtain runable jar from build stage ###
 ###########################################
-COPY paper/paper.jar ${SERVER_PATH}/
+
+RUN curl -Lo paper.jar https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/493/downloads/paper-1.20.4-493.jar 
+RUN mv paper.jar ${SERVER_PATH}/
 
 ######################
 ### Obtain scripts ###
@@ -87,7 +89,7 @@ RUN ln -s $PLUGINS_PATH $SERVER_PATH/plugins && \
 
 RUN ls
 
-ENTRYPOINT [ "sh", "./docker-entrypoint.sh" ]
+ENTRYPOINT ["./docker-entrypoint.sh" ]
 
 # Run Command
 CMD [ "serve" ]
